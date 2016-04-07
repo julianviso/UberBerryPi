@@ -1,6 +1,9 @@
 import flask
+import requests
 from uber_rides.auth import AuthorizationCodeGrant
 from uber_rides.client import UberRidesClient
+from json import load
+
 
 app = flask.Flask(__name__)
 
@@ -27,8 +30,11 @@ def display_token():
     session = auth_flow.get_session(flask.request.url)
     client = UberRidesClient(session)
     credentials = session.oauth2credential
-    return "hello" + str(credentials) + "empty string"
+    #client.get_products()
+    return getGeoLocation() 
 
+def getGeoLocation():
+    return requests.get('https://api.ipify.org/?format=json').json()["ip"]
 
 if __name__ == "__main__":
     app.run()
