@@ -1,5 +1,6 @@
 import flask
 import requests
+import traceback
 from uber_rides.auth import AuthorizationCodeGrant
 from uber_rides.client import UberRidesClient
 
@@ -17,8 +18,8 @@ REDIRECT_URL = "http://localhost:5000/landing_screen"
 MY_LATITUDE = "33.437435"
 MY_LONGITUDE = "-84.587303"
 
-DEST_LATITUDE = ""
-DEST_LONGITUDE = ""
+DEST_LATITUDE = "38.071423"
+DEST_LONGITUDE = "-84.496689"
 
 auth_flow = AuthorizationCodeGrant(
         CLIENT_ID,
@@ -71,11 +72,21 @@ def get_products():
     if not isClientValid():
         return "Please create an uber session and client at http://localhost:5000\n"
     print "Requesting products from Uber"
-    response = CLIENT.get_products(LATITUDE, LONGITUDE)
+    response = CLIENT.get_products(MY_LATITUDE, MY_LONGITUDE)
     print "products recieved"
     return str(response.json)
 
-@app.route("/")
+@app.route("/get_price")
+def get_price_estimates():
+    if not isClientValid():
+        return "Please create an uber session and client at http://localhost:5000\n"
+    print "Requesting price estimates from Uber"
+    try:
+        response = CLIENT.get_price_estimates(MY_LATITUDE, MY_LONGITUDE, DEST_LONGITUDE, DEST_LATITUDE)
+    except Exception as e:
+        traceback.print_exception(e)
+    print "Price estimates recieved"
+    return str(response.json)
 
 
 
