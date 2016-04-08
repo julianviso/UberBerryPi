@@ -4,6 +4,8 @@ import traceback
 from uber_rides.auth import AuthorizationCodeGrant
 from uber_rides.client import UberRidesClient
 
+from uber_requests import UberRequest
+
 
 app = flask.Flask(__name__)
 
@@ -83,8 +85,8 @@ def get_products():
     return str(response.json)
 
 #Bugged Call to SDK /v1/estimates/price
-"""
-@app.route("/get_price")
+
+@app.route("/Xget_priceX")
 def get_price_estimates():
     if not isClientValid():
         return "Please create an uber session and client at http://localhost:5000\n"
@@ -95,7 +97,7 @@ def get_price_estimates():
         print traceback.format_exc()
     print "Price estimates recieved"
     return str(response.json)
-"""
+
 @app.route("/custom_price")
 def get_custom_price_estimates():
     headers = {'Authorization': 'Bearer {0}'.format(SESSION.oauth2credential.access_token)}
@@ -108,6 +110,13 @@ def get_custom_price_estimates():
     except Exception as e:
         print traceback.format_exc()
     return r.text
+
+@app.route("/get_price")
+def get_price():
+    price_estimates_request = UberRequest.price_estimates(CLIENT.api_host, SESSION, MY_LATITUDE, MY_LONGITUDE, DEST_LATITUDE, DEST_LONGITUDE)
+    price_estimates_request.make_request()
+    return price_estimates_request.response.text
+
 
 def getGeoLocation():
     return requests.get('https://api.ipify.org/?format=json').json()["ip"]
