@@ -67,6 +67,10 @@ def get_client_valid():
     else:
         return "False"
 
+@app.route("/get_access_token")
+def get_access_token():
+    return SESSION.oauth2credential.access_token
+
 @app.route("/get_products")
 def get_products():
     if not isClientValid():
@@ -74,21 +78,36 @@ def get_products():
     print "Requesting products from Uber"
     response = CLIENT.get_products(MY_LATITUDE, MY_LONGITUDE)
     print "products recieved"
+    print str(CLIENT)+ "\n"
+
     return str(response.json)
 
+#Bugged Call to SDK /v1/estimates/price
+"""
 @app.route("/get_price")
 def get_price_estimates():
     if not isClientValid():
         return "Please create an uber session and client at http://localhost:5000\n"
     print "Requesting price estimates from Uber"
     try:
-        response = CLIENT.get_price_estimates(MY_LATITUDE, MY_LONGITUDE, DEST_LONGITUDE, DEST_LATITUDE)
+        response = CLIENT.get_price_estimates(MY_LATITUDE, MY_LONGITUDE, DEST_LATITUDE, DEST_LONGITUDE)
     except Exception as e:
-        traceback.print_exception(e)
+        print traceback.format_exc()
     print "Price estimates recieved"
     return str(response.json)
-
-
+"""
+@app.route("/custom_price")
+def get_custom_price_estimates():
+    headers = {'Authorization': 'Bearer {0}'.format(SESSION.oauth2credential.access_token)}
+    params = {"start_latitude": MY_LATITUDE,
+    "start_longitude": MY_LONGITUDE,
+    "end_latitude": DEST_LATITUDE,
+    "end_longitude": DEST_LATITUDE}
+    try:
+        r = requests.get("https://{0}/v1/estimates/price".format(CLIENT.api_host), params=params,  headers=headers)
+    except Exception as e:
+        print traceback.format_exc()
+    return r.text
 
 def getGeoLocation():
     return requests.get('https://api.ipify.org/?format=json').json()["ip"]
