@@ -13,11 +13,15 @@ def getCurrentAddress():
 
 def getLatLongitudes():
 	geolocator = Nominatim()
-	whereToPrompt = raw_input("What address do you want to get the latitude and longitude of? ")
-	location = geolocator.geocode(whereToPrompt)
+	currentLocation = raw_input("What's your current address? ")
+	whereToPrompt = raw_input("\nWhat address do you want to get the latitude and longitude of? ")
+	myLocation = geolocator.geocode(currentLocation)
+	destination = geolocator.geocode(whereToPrompt)
 	if location:
 		#print currentAddress + "\n"
-		print location.address + "\n"
-		print((location.latitude, location.longitude))
+		print myLocation.address + "\n"
+		print((myLocation.latitude, myLocation.longitude))
+		print destination.address + "\n"
+		print ((destination.latitude, destination.longitude))
 	else:
-		print "Not able to get address, try again"
+		return "Not able to get address, try again"
